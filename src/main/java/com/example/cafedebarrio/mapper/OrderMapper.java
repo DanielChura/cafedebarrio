@@ -1,6 +1,5 @@
 package com.example.cafedebarrio.mapper;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.example.cafedebarrio.dto.response.OrderItemResponse;
@@ -23,11 +22,10 @@ public final class OrderMapper {
         response.setTotal(order.getTotal());
         response.setCreatedAt(order.getCreatedAt());
 
-        List<OrderItemResponse> itemResponses = order.getItems() == null
-                ? Collections.emptyList()
-                : order.getItems().stream()
-                        .map(OrderMapper::toItemResponse)
-                        .toList();
+        List<OrderItemResponse> itemResponses = order.getItems()
+                .stream()
+                .map(item -> toItemResponse(item))
+                .toList();
 
         response.setItems(itemResponses);
         return response;
@@ -35,9 +33,7 @@ public final class OrderMapper {
 
     public static OrderItemResponse toItemResponse(OrderDetail item) {
         OrderItemResponse response = new OrderItemResponse();
-        if (item.getProduct() != null) {
-            response.setProductId(item.getProduct().getId());
-        }
+        response.setProductId(item.getProduct().getId());
         response.setProductName(item.getProductName());
         response.setQuantity(item.getQuantity());
         response.setUnitPrice(item.getUnitPrice());

@@ -1,8 +1,9 @@
 package com.example.cafedebarrio.service;
 
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +27,12 @@ public class ProductService {
         this.categoryService = categoryService;
     }
 
-    public List<ProductResponse> findAll(UUID categoryId, String name, Boolean onlyActive) {
+    public Page<ProductResponse> findAll(UUID categoryId, String name, Boolean onlyActive, Pageable pageable) {
         boolean activeFilter = (onlyActive == null) || onlyActive;
         String cleanName = (name != null && !name.isBlank()) ? name.trim() : null;
 
-        return productRepository.findByFilters(categoryId, cleanName, activeFilter)
-                .stream()
-                .map(p -> ProductMapper.toResponse(p))
-                .toList();
+        return productRepository.findByFilters(categoryId, cleanName, activeFilter, pageable)
+                .map(p -> ProductMapper.toResponse(p));
     }
 
     public ProductResponse findById(UUID id) {

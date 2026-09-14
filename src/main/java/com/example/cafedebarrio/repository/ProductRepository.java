@@ -3,6 +3,8 @@ package com.example.cafedebarrio.repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,8 +23,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
               AND (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
               AND (:onlyActive = false OR p.isActive = true)
             """)
-    List<Product> findByFilters(
+    Page<Product> findByFilters(
             @Param("categoryId") UUID categoryId,
             @Param("name") String name,
-            @Param("onlyActive") boolean onlyActive);
+            @Param("onlyActive") boolean onlyActive,
+            Pageable pageable);
 }

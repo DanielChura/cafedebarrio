@@ -1,9 +1,10 @@
 package com.example.cafedebarrio.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,11 +34,9 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public List<OrderResponse> findAll() {
-        return orderRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(OrderMapper::toResponse)
-                .toList();
+    public Page<OrderResponse> findAll(Pageable pageable) {
+        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(OrderMapper::toResponse);
     }
 
     public OrderResponse findById(UUID id) {
