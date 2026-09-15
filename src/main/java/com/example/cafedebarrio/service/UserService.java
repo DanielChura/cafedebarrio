@@ -4,12 +4,14 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.cafedebarrio.dto.request.UserRequest;
 import com.example.cafedebarrio.dto.response.UserResponse;
 import com.example.cafedebarrio.entity.User;
+import com.example.cafedebarrio.exception.BadRequestException;
 import com.example.cafedebarrio.exception.ResourceNotFoundException;
 import com.example.cafedebarrio.mapper.UserMapper;
 import com.example.cafedebarrio.repository.UserRepository;
@@ -19,9 +21,11 @@ import com.example.cafedebarrio.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -35,7 +39,11 @@ public class UserService {
 
     @Transactional
     public UserResponse create(UserRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new BadRequestException("Email is already in use");
+        }
         User user = UserMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return UserMapper.toResponse(userRepository.save(user));
     }
 
@@ -43,6 +51,7 @@ public class UserService {
     public UserResponse update(UUID id, UserRequest request) {
         User user = findUserByIdOrThrow(id);
         UserMapper.updateEntity(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return UserMapper.toResponse(userRepository.save(user));
     }
 
