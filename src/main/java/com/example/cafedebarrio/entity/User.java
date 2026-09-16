@@ -2,8 +2,8 @@ package com.example.cafedebarrio.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,8 +44,7 @@ public class User implements UserDetails {
     @Email(message = "Email is not valid")
     private String email;
 
-    @Column(name = "password")
-    @Length(min = 1, max = 50, message = "Password must be between 1 and 50 characters")
+    @Column(name = "password", length = 255)
     @NotNull(message = "Password is required")
     private String password;
 
@@ -54,13 +53,22 @@ public class User implements UserDetails {
     @NotNull(message = "Role is required")
     private UserRole role;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public UUID getUserId() {
         return userId;

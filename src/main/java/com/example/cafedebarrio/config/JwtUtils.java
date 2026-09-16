@@ -22,8 +22,8 @@ public class JwtUtils {
     private final long expiration;
 
     public JwtUtils(
-            @Value("${jwt.secret:defaultSecretKeyForCafeDeBarrioApplicationMustBe32BytesOrMore!}") String secret,
-            @Value("${jwt.expiration:86400000}") long expiration) {
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long expiration) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }

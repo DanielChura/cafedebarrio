@@ -23,4 +23,24 @@ public class AuthResponse {
         this.role = role;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
 }
