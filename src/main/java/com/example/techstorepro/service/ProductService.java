@@ -34,32 +34,32 @@ public class ProductService {
     }
 
     public ProductResponse findById(UUID id) {
-        return ProductMapper.toResponse(findProductByIdOrThrow(id));
+        return ProductMapper.toResponse(getProduct(id));
     }
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-        Category category = categoryService.findCategoryByIdOrThrow(request.getCategoryId());
+        Category category = categoryService.getCategory(request.getCategoryId());
         Product product = ProductMapper.toEntity(request, category);
         return ProductMapper.toResponse(productRepository.save(product));
     }
 
     @Transactional
     public ProductResponse update(UUID id, ProductRequest request) {
-        Product product = findProductByIdOrThrow(id);
-        Category category = categoryService.findCategoryByIdOrThrow(request.getCategoryId());
+        Product product = getProduct(id);
+        Category category = categoryService.getCategory(request.getCategoryId());
         ProductMapper.updateEntity(product, request, category);
         return ProductMapper.toResponse(productRepository.save(product));
     }
 
     @Transactional
     public void deleteById(UUID id) {
-        Product product = findProductByIdOrThrow(id);
+        Product product = getProduct(id);
         product.setActive(false);
         productRepository.save(product);
     }
 
-    private Product findProductByIdOrThrow(UUID id) {
+    private Product getProduct(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
     }

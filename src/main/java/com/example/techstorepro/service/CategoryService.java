@@ -29,7 +29,7 @@ public class CategoryService {
     }
 
     public CategoryResponse findById(UUID id) {
-        return CategoryMapper.toResponse(findCategoryByIdOrThrow(id));
+        return CategoryMapper.toResponse(getCategory(id));
     }
 
     @Transactional
@@ -40,18 +40,18 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse update(UUID id, CategoryRequest request) {
-        Category category = findCategoryByIdOrThrow(id);
+        Category category = getCategory(id);
         CategoryMapper.updateEntity(category, request);
         return CategoryMapper.toResponse(categoryRepository.save(category));
     }
 
     @Transactional
     public void deleteById(UUID id) {
-        Category category = findCategoryByIdOrThrow(id);
+        Category category = getCategory(id);
         categoryRepository.delete(category);
     }
 
-    public Category findCategoryByIdOrThrow(UUID id) {
+    public Category getCategory(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));
     }

@@ -8,21 +8,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.techstorepro.dto.request.OrderItemRequest;
 import com.example.techstorepro.dto.request.OrderRequest;
 import com.example.techstorepro.dto.request.OrderStatusRequest;
 import com.example.techstorepro.dto.response.OrderResponse;
+import com.example.techstorepro.entity.Cart;
+import com.example.techstorepro.entity.CartItem;
 import com.example.techstorepro.entity.Order;
 import com.example.techstorepro.entity.OrderDetail;
 import com.example.techstorepro.entity.Product;
-import com.example.techstorepro.entity.User;
 import com.example.techstorepro.enums.OrderState;
 import com.example.techstorepro.exception.BadRequestException;
 import com.example.techstorepro.exception.ResourceNotFoundException;
 import com.example.techstorepro.mapper.OrderMapper;
+import com.example.techstorepro.repository.CartRepository;
 import com.example.techstorepro.repository.OrderRepository;
 import com.example.techstorepro.repository.ProductRepository;
-import com.example.techstorepro.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final CartService cartService;
 
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable)
@@ -41,54 +42,49 @@ public class OrderService {
     }
 
     public OrderResponse findById(UUID id) {
-        return OrderMapper.toResponse(findOrderByIdOrThrow(id));
+        return OrderMapper.toResponse(getOrder(id));
     }
 
     @Transactional
     public OrderResponse create(OrderRequest request) {
-        boolean noItems = request.getItems() == null || request.getItems().isEmpty();
+        Cart cart = cartRepository.findByUser_Id(request.getUserId())
+                .orElseThrow(() -> new BadRequestException("Cart is empty"));
 
-        if (noItems) {
-            throw new BadRequestException("Order must contain at least one product");
+        if (cart.getItems().isEmpty()) {
+            throw new BadRequestException("Cart is empty");
         }
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.getUserId()));
-
         Order order = new Order();
-        order.setUser(user);
+        order.setUser(cart.getUser());
         order.setPhone(request.getPhone());
         order.setAddress(request.getAddress());
         order.setStatus(OrderState.PENDING);
 
         BigDecimal total = BigDecimal.ZERO;
 
-        for (OrderItemRequest itemRequest : request.getItems()) {
-            Product product = productRepository.findById(itemRequest.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Product not found with ID: " + itemRequest.getProductId()));
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
 
             if (!product.getActive()) {
                 throw new BadRequestException("Product '" + product.getName() + "' is currently unavailable");
             }
 
-            if (product.getStock() < itemRequest.getQuantity()) {
-                throw new BadRequestException(String.format(
-                        "Insufficient stock for product '" + product.getName() + "'. Available stock: "
-                                + product.getStock() + ", Requested: " + itemRequest.getQuantity()));
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new BadRequestException("Insufficient stock for product '" + product.getName()
+                        + "'. Available stock: " + product.getStock() + ", Requested: " + cartItem.getQuantity());
             }
 
-            product.setStock(product.getStock() - itemRequest.getQuantity());
+            product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
 
             BigDecimal unitPrice = product.getPrice();
-            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setProduct(product);
             detail.setProductName(product.getName());
-            detail.setQuantity(itemRequest.getQuantity());
+            detail.setQuantity(cartItem.getQuantity());
             detail.setUnitPrice(unitPrice);
             detail.setSubtotal(subtotal);
 
@@ -98,6 +94,7 @@ public class OrderService {
 
         order.setTotal(total);
         Order savedOrder = orderRepository.save(order);
+        cartService.clear(request.getUserId());
         return OrderMapper.toResponse(savedOrder);
     }
 
@@ -109,7 +106,7 @@ public class OrderService {
             throw new BadRequestException("Status is required");
         }
 
-        Order order = findOrderByIdOrThrow(id);
+        Order order = getOrder(id);
         OrderState currentStatus = order.getStatus();
 
         validateStateTransition(currentStatus, newStatus);
@@ -136,7 +133,7 @@ public class OrderService {
         }
     }
 
-    private Order findOrderByIdOrThrow(UUID id) {
+    private Order getOrder(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + id));
     }

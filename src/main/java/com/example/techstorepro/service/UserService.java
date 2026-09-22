@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public UserResponse findById(UUID id) {
-        return UserMapper.toResponse(findUserByIdOrThrow(id));
+        return UserMapper.toResponse(getUser(id));
     }
 
     @Transactional
@@ -47,7 +47,7 @@ public class UserService {
 
     @Transactional
     public UserResponse update(UUID id, UserRequest request) {
-        User user = findUserByIdOrThrow(id);
+        User user = getUser(id);
         UserMapper.updateEntity(user, request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         return UserMapper.toResponse(userRepository.save(user));
@@ -55,11 +55,11 @@ public class UserService {
 
     @Transactional
     public void deleteById(UUID id) {
-        User user = findUserByIdOrThrow(id);
+        User user = getUser(id);
         userRepository.delete(user);
     }
 
-    private User findUserByIdOrThrow(UUID id) {
+    private User getUser(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
     }

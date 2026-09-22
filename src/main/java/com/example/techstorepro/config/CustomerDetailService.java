@@ -8,14 +8,13 @@ import org.springframework.stereotype.Service;
 import com.example.techstorepro.entity.User;
 import com.example.techstorepro.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CustomerDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
-    public CustomerDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

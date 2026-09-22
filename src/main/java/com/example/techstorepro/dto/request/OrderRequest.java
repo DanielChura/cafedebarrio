@@ -1,15 +1,10 @@
 package com.example.techstorepro.dto.request;
 
-import java.util.List;
-
 import java.util.UUID;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,10 +22,4 @@ public class OrderRequest {
     @NotBlank(message = "Address is required")
     @Size(max = 200, message = "Address must be at most 200 characters")
     private String address;
-
-    @NotNull(message = "Items are required")
-    @NotEmpty(message = "Order must have at least one item")
-    @Valid
-    private List<OrderItemRequest> items;
-
 }
