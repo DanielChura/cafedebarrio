@@ -3,8 +3,6 @@ package com.example.techstorepro.dto.response;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.example.techstorepro.enums.UserRole;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +12,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+public class ReviewResponse {
+
     private UUID id;
-    private String name;
-    private String email;
-    private UserRole role;
-    private String address;
-    private String phone;
+    private UUID userId;
+    private String userName;
+    private UUID productId;
+    private String productName;
+    private Integer rating;
+    private String comment;
     private LocalDateTime createdAt;
 }

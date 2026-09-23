@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.hibernate.validator.constraints.Length;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,5 +28,6 @@ public class Category {
 
     @Length(min = 1, max = 50)
     @NotNull(message = "Name is required")
+    @Column(name = "nombre", nullable = false, length = 50)
     private String name;
 }

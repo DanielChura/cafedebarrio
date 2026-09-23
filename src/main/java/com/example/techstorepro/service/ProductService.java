@@ -1,5 +1,6 @@
 package com.example.techstorepro.service;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import com.example.techstorepro.dto.request.ProductRequest;
 import com.example.techstorepro.dto.response.ProductResponse;
 import com.example.techstorepro.entity.Category;
 import com.example.techstorepro.entity.Product;
+import com.example.techstorepro.exception.BadRequestException;
 import com.example.techstorepro.exception.ResourceNotFoundException;
 import com.example.techstorepro.mapper.ProductMapper;
 import com.example.techstorepro.repository.ProductRepository;
@@ -24,6 +26,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
+    private final CloudinaryService cloudinaryService;
 
     public Page<ProductResponse> findAll(UUID categoryId, String name, Boolean onlyActive, Pageable pageable) {
         boolean activeFilter = (onlyActive == null) || onlyActive;
@@ -41,6 +44,11 @@ public class ProductService {
     public ProductResponse create(ProductRequest request) {
         Category category = categoryService.getCategory(request.getCategoryId());
         Product product = ProductMapper.toEntity(request, category);
+
+        Map<String, Object> result = cloudinaryService.upload(request.getImage());
+        product.setImageUrl((String) result.get("secure_url"));
+        product.setPublicId((String) result.get("public_id"));
+
         return ProductMapper.toResponse(productRepository.save(product));
     }
 
@@ -49,7 +57,20 @@ public class ProductService {
         Product product = getProduct(id);
         Category category = categoryService.getCategory(request.getCategoryId());
         ProductMapper.updateEntity(product, request, category);
-        return ProductMapper.toResponse(productRepository.save(product));
+
+        String oldPublicId = product.getPublicId();
+        Map<String, Object> result = cloudinaryService.upload(request.getImage());
+        product.setImageUrl((String) result.get("secure_url"));
+        product.setPublicId((String) result.get("public_id"));
+
+        Product saved = productRepository.save(product);
+        if (oldPublicId != null && !oldPublicId.equals(saved.getPublicId())) {
+            try {
+                cloudinaryService.delete(oldPublicId);
+            } catch (BadRequestException e) {
+            }
+        }
+        return ProductMapper.toResponse(saved);
     }
 
     @Transactional

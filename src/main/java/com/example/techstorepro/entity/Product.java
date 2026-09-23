@@ -55,9 +55,13 @@ public class Product {
     private Integer stock;
 
     @NotBlank(message = "Image URL is required")
-    @Size(max = 200, message = "Image URL must be at most 200 characters")
-    @Column(nullable = false, length = 200)
+    @Size(max = 500, message = "Image URL must be at most 500 characters")
+    @Column(nullable = false, length = 500)
     private String imageUrl;
+
+    @Size(max = 255, message = "Image public ID must be at most 255 characters")
+    @Column(length = 255)
+    private String publicId;
 
     @Column(name = "is_active", nullable = false)
     private Boolean active = true;

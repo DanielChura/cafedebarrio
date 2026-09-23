@@ -20,6 +20,7 @@ public class ProductResponse {
     private BigDecimal price;
     private Integer stock;
     private String imageUrl;
+    private String publicId;
     private Boolean active;
     private UUID categoryId;
     private String categoryName;

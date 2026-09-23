@@ -21,7 +21,6 @@ public final class ProductMapper {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
-        product.setImageUrl(request.getImageUrl());
         product.setCategory(category);
     }
 
@@ -33,6 +32,7 @@ public final class ProductMapper {
         response.setPrice(product.getPrice());
         response.setStock(product.getStock());
         response.setImageUrl(product.getImageUrl());
+        response.setPublicId(product.getPublicId());
         response.setActive(product.getActive());
         if (product.getCategory() != null) {
             response.setCategoryId(product.getCategory().getId());

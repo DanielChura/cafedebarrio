@@ -3,6 +3,8 @@ package com.example.techstorepro.dto.request;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -31,9 +33,8 @@ public class ProductRequest {
     @Min(value = 0, message = "Stock must be greater than or equal to 0")
     private Integer stock;
 
-    @NotBlank(message = "Image URL is required")
-    @Size(max = 200, message = "Image URL must be at most 200 characters")
-    private String imageUrl;
+    @NotNull(message = "Image is required")
+    private MultipartFile image;
 
     @NotNull(message = "Category is required")
     private UUID categoryId;

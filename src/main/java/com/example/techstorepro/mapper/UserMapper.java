@@ -12,6 +12,8 @@ public class UserMapper {
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
         return user;
     }
 
@@ -20,6 +22,8 @@ public class UserMapper {
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
     }
 
     public static UserResponse toResponse(User user) {
@@ -28,6 +32,8 @@ public class UserMapper {
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
+        response.setAddress(user.getAddress());
+        response.setPhone(user.getPhone());
         response.setCreatedAt(user.getCreatedAt());
         return response;
     }

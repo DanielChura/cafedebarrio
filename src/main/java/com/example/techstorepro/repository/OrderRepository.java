@@ -2,8 +2,6 @@ package com.example.techstorepro.repository;
 
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.techstorepro.entity.Order;

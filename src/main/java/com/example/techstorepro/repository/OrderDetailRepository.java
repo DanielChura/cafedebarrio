@@ -7,4 +7,5 @@ import com.example.techstorepro.entity.OrderDetail;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, UUID> {
 
+    boolean existsByOrder_User_IdAndProduct_Id(UUID userId, UUID productId);
 }
