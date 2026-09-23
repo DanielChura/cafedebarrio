@@ -41,9 +41,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse create(ReviewRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.getUserId()));
+    public ReviewResponse create(UUID userId, ReviewRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Product not found with ID: " + request.getProductId()));

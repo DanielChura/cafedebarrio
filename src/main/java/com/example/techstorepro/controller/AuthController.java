@@ -3,6 +3,7 @@ package com.example.techstorepro.controller;
 import java.security.Principal;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import com.example.techstorepro.dto.request.LoginRequest;
 import com.example.techstorepro.dto.request.RegisterRequest;
 import com.example.techstorepro.dto.response.AuthResponse;
 import com.example.techstorepro.dto.response.UserResponse;
+import com.example.techstorepro.entity.User;
 import com.example.techstorepro.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -38,7 +40,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public UserResponse getCurrentUser(Principal principal) {
-        return authService.getProfile(principal.getName());
+    public UserResponse getCurrentUser(@AuthenticationPrincipal User user) {
+        return authService.getProfile(user.getEmail());
     }
 }

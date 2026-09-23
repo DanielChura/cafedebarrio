@@ -13,9 +13,6 @@ import lombok.Setter;
 @Setter
 public class ReviewRequest {
 
-    @NotNull(message = "User ID is required")
-    private UUID userId;
-
     @NotNull(message = "Product ID is required")
     private UUID productId;
 

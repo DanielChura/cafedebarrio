@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.techstorepro.dto.request.OrderRequest;
 import com.example.techstorepro.dto.request.OrderStatusRequest;
 import com.example.techstorepro.dto.response.OrderResponse;
+import com.example.techstorepro.entity.User;
 import com.example.techstorepro.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -35,21 +37,22 @@ public class OrderController {
     @GetMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public Page<OrderResponse> findAll(
+            @AuthenticationPrincipal User user,
             @PageableDefault(size = 10, sort = { "createdAt" }, direction = Sort.Direction.DESC) Pageable pageable) {
-        return orderService.findAll(pageable);
+        return orderService.findAllFor(user, pageable);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
-    public OrderResponse findById(@PathVariable UUID id) {
-        return orderService.findById(id);
+    public OrderResponse findById(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        return orderService.findByIdFor(user, id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
-    public OrderResponse create(@Valid @RequestBody OrderRequest request) {
-        return orderService.create(request);
+    public OrderResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody OrderRequest request) {
+        return orderService.create(user.getId(), request);
     }
 
     @PatchMapping("/{id}/status")

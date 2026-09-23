@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,9 @@ import com.example.techstorepro.entity.CartItem;
 import com.example.techstorepro.entity.Order;
 import com.example.techstorepro.entity.OrderDetail;
 import com.example.techstorepro.entity.Product;
+import com.example.techstorepro.entity.User;
 import com.example.techstorepro.enums.OrderState;
+import com.example.techstorepro.enums.UserRole;
 import com.example.techstorepro.exception.BadRequestException;
 import com.example.techstorepro.exception.ResourceNotFoundException;
 import com.example.techstorepro.mapper.OrderMapper;
@@ -36,18 +39,26 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final CartService cartService;
 
-    public Page<OrderResponse> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable)
+    public Page<OrderResponse> findAllFor(User user, Pageable pageable) {
+        if (user.getRole() == UserRole.ADMIN) {
+            return orderRepository.findAll(pageable)
+                    .map(OrderMapper::toResponse);
+        }
+        return orderRepository.findByUser_Id(user.getId(), pageable)
                 .map(OrderMapper::toResponse);
     }
 
-    public OrderResponse findById(UUID id) {
-        return OrderMapper.toResponse(getOrder(id));
+    public OrderResponse findByIdFor(User user, UUID id) {
+        Order order = getOrder(id);
+        if (user.getRole() != UserRole.ADMIN && !order.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("No tienes permiso para ver este pedido");
+        }
+        return OrderMapper.toResponse(order);
     }
 
     @Transactional
-    public OrderResponse create(OrderRequest request) {
-        Cart cart = cartRepository.findByUser_Id(request.getUserId())
+    public OrderResponse create(UUID userId, OrderRequest request) {
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new BadRequestException("Cart is empty"));
 
         if (cart.getItems().isEmpty()) {
@@ -94,7 +105,7 @@ public class OrderService {
 
         order.setTotal(total);
         Order savedOrder = orderRepository.save(order);
-        cartService.clear(request.getUserId());
+        cartService.clear(userId);
         return OrderMapper.toResponse(savedOrder);
     }
 

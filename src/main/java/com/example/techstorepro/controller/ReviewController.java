@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.techstorepro.dto.request.ReviewRequest;
 import com.example.techstorepro.dto.response.ReviewResponse;
+import com.example.techstorepro.entity.User;
 import com.example.techstorepro.service.ReviewService;
 
 import jakarta.validation.Valid;
@@ -42,8 +44,8 @@ public class ReviewController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
-    public ReviewResponse create(@Valid @RequestBody ReviewRequest request) {
-        return reviewService.create(request);
+    public ReviewResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody ReviewRequest request) {
+        return reviewService.create(user.getId(), request);
     }
 
     @DeleteMapping("/{id}")
