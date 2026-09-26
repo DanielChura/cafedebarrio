@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.techstorepro.dto.request.ProductRequest;
 import com.example.techstorepro.dto.response.ProductResponse;
+import com.example.techstorepro.dto.update.UpdateProductRequest;
 import com.example.techstorepro.entity.Category;
 import com.example.techstorepro.entity.Product;
 import com.example.techstorepro.exception.BadRequestException;
 import com.example.techstorepro.exception.ResourceNotFoundException;
 import com.example.techstorepro.mapper.ProductMapper;
 import com.example.techstorepro.repository.ProductRepository;
+import com.example.techstorepro.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,17 +29,18 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
     private final CloudinaryService cloudinaryService;
+    private final ReviewRepository reviewRepository;
 
     public Page<ProductResponse> findAll(UUID categoryId, String name, Boolean onlyActive, Pageable pageable) {
         boolean activeFilter = (onlyActive == null) || onlyActive;
         String cleanName = (name != null && !name.isBlank()) ? name.trim() : null;
 
         return productRepository.findByFilters(categoryId, cleanName, activeFilter, pageable)
-                .map(p -> ProductMapper.toResponse(p));
+                .map(this::toResponseWithRating);
     }
 
     public ProductResponse findById(UUID id) {
-        return ProductMapper.toResponse(getProduct(id));
+        return toResponseWithRating(getProduct(id));
     }
 
     @Transactional
@@ -49,14 +52,18 @@ public class ProductService {
         product.setImageUrl((String) result.get("secure_url"));
         product.setPublicId((String) result.get("public_id"));
 
-        return ProductMapper.toResponse(productRepository.save(product));
+        return toResponseWithRating(productRepository.save(product));
     }
 
     @Transactional
-    public ProductResponse update(UUID id, ProductRequest request) {
+    public ProductResponse update(UUID id, UpdateProductRequest request) {
         Product product = getProduct(id);
         Category category = categoryService.getCategory(request.getCategoryId());
         ProductMapper.updateEntity(product, request, category);
+
+        if (request.getImage() == null || request.getImage().isEmpty()) {
+            return toResponseWithRating(productRepository.save(product));
+        }
 
         String oldPublicId = product.getPublicId();
         Map<String, Object> result = cloudinaryService.upload(request.getImage());
@@ -70,7 +77,7 @@ public class ProductService {
             } catch (BadRequestException e) {
             }
         }
-        return ProductMapper.toResponse(saved);
+        return toResponseWithRating(saved);
     }
 
     @Transactional
@@ -83,5 +90,12 @@ public class ProductService {
     private Product getProduct(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+    }
+
+    private ProductResponse toResponseWithRating(Product product) {
+        ProductResponse response = ProductMapper.toResponse(product);
+        response.setAverageRating(reviewRepository.findAverageRatingByProductId(product.getId()));
+        response.setReviewCount(reviewRepository.countByProduct_Id(product.getId()));
+        return response;
     }
 }

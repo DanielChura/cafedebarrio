@@ -3,6 +3,7 @@ package com.example.techstorepro.config;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -24,6 +25,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
 
+    @Value("${app.frontend.oauth-success-url:http://localhost:4200/oauth/callback}")
+    private String frontendSuccessUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
@@ -44,8 +48,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String token = jwtUtils.generateToken(user);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"token\": \"" + token + "\", \"message\": \"Login con Google exitoso!\"}");
+        getRedirectStrategy().sendRedirect(request, response, frontendSuccessUrl + "?token=" + token);
     }
 }

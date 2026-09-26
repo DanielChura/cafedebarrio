@@ -2,7 +2,9 @@ package com.example.techstorepro.mapper;
 
 import com.example.techstorepro.dto.request.UserRequest;
 import com.example.techstorepro.dto.response.UserResponse;
+import com.example.techstorepro.dto.update.UpdateUserRequest;
 import com.example.techstorepro.entity.User;
+import com.example.techstorepro.enums.UserRole;
 
 public class UserMapper {
 
@@ -11,17 +13,17 @@ public class UserMapper {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setRole(request.getRole());
+        user.setRole(UserRole.CUSTOMER);
         user.setAddress(request.getAddress());
         user.setPhone(request.getPhone());
         return user;
     }
 
-    public static void updateEntity(User user, UserRequest request) {
+    public static void updateEntity(User user, UpdateUserRequest request) {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setRole(request.getRole());
+        user.setPassword(user.getPassword());
+        user.setRole(user.getRole() != null ? user.getRole() : UserRole.CUSTOMER);
         user.setAddress(request.getAddress());
         user.setPhone(request.getPhone());
     }

@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +33,20 @@ public class GlobalExceptionHandler {
                 .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
         ApiError body = new ApiError("Validation failed", HttpStatus.BAD_REQUEST.value(), errors);
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ApiError> handleBind(BindException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
+        ApiError body = new ApiError("Validation failed", HttpStatus.BAD_REQUEST.value(), errors);
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiError> handleMultipart(MultipartException ex) {
+        return status(HttpStatus.BAD_REQUEST, "Error al subir el archivo: " + ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

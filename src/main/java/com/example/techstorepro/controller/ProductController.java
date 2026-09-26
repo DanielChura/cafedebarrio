@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.techstorepro.dto.request.ProductRequest;
 import com.example.techstorepro.dto.response.ProductResponse;
+import com.example.techstorepro.dto.update.UpdateProductRequest;
 import com.example.techstorepro.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -55,7 +56,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ProductResponse update(@PathVariable UUID id, @Valid @ModelAttribute ProductRequest request) {
+    public ProductResponse update(@PathVariable UUID id, @Valid @ModelAttribute UpdateProductRequest request) {
         return productService.update(id, request);
     }
 

@@ -2,6 +2,7 @@ package com.example.techstorepro.mapper;
 
 import com.example.techstorepro.dto.request.ProductRequest;
 import com.example.techstorepro.dto.response.ProductResponse;
+import com.example.techstorepro.dto.update.UpdateProductRequest;
 import com.example.techstorepro.entity.Category;
 import com.example.techstorepro.entity.Product;
 
@@ -12,11 +13,15 @@ public final class ProductMapper {
 
     public static Product toEntity(ProductRequest request, Category category) {
         Product product = new Product();
-        updateEntity(product, request, category);
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setStock(request.getStock());
+        product.setCategory(category);
         return product;
     }
 
-    public static void updateEntity(Product product, ProductRequest request, Category category) {
+    public static void updateEntity(Product product, UpdateProductRequest request, Category category) {
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());

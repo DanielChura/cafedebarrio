@@ -1,4 +1,4 @@
-package com.example.techstorepro.dto.request;
+package com.example.techstorepro.dto.update;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductRequest {
+public class UpdateProductRequest {
 
     @NotBlank(message = "Name is required")
     @Size(max = 200, message = "Name must be at most 200 characters")
@@ -33,7 +33,9 @@ public class ProductRequest {
     @Min(value = 0, message = "Stock must be greater than or equal to 0")
     private Integer stock;
 
-    @NotNull(message = "Image is required")
+    // Opcional: si es null o vacío se conserva la imagen actual.
+    // El input file del navegador no se puede prellenar desde la URL,
+    // por eso el update no puede exigirla.
     private MultipartFile image;
 
     @NotNull(message = "Category is required")

@@ -36,12 +36,12 @@ public class Product {
     private UUID id;
 
     @NotBlank(message = "Name is required")
-    @Size(max = 50, message = "Name must be at most 50 characters")
-    @Column(nullable = false, length = 50)
+    @Size(max = 200, message = "Name must be at most 200 characters")
+    @Column(nullable = false, length = 200)
     private String name;
 
-    @Size(max = 200, message = "Description must be at most 200 characters")
-    @Column(length = 200)
+    @Size(max = 600, message = "Description must be at most 600 characters")
+    @Column(length = 600)
     private String description;
 
     @NotNull(message = "Price is required")

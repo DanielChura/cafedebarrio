@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.techstorepro.dto.request.UserRequest;
 import com.example.techstorepro.dto.response.UserResponse;
+import com.example.techstorepro.dto.update.UpdateUserRequest;
 import com.example.techstorepro.entity.User;
 import com.example.techstorepro.exception.BadRequestException;
 import com.example.techstorepro.exception.ResourceNotFoundException;
@@ -46,10 +47,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse update(UUID id, UserRequest request) {
+    public UserResponse update(UUID id, UpdateUserRequest request) {
         User user = getUser(id);
         UserMapper.updateEntity(user, request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return UserMapper.toResponse(userRepository.save(user));
     }
 

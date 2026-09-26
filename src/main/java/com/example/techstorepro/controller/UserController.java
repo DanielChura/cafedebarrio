@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.techstorepro.dto.request.UserRequest;
 import com.example.techstorepro.dto.response.UserResponse;
+import com.example.techstorepro.dto.update.UpdateUserRequest;
 import com.example.techstorepro.service.UserService;
 
 import jakarta.validation.Valid;
@@ -52,7 +53,7 @@ public class UserController {
     @PutMapping("/{id}")
     public UserResponse update(
             @PathVariable UUID id,
-            @Valid @RequestBody UserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request) {
         return userService.update(id, request);
     }
 

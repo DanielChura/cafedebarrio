@@ -24,4 +24,6 @@ public class ProductResponse {
     private Boolean active;
     private UUID categoryId;
     private String categoryName;
+    private Double averageRating;
+    private Long reviewCount;
 }

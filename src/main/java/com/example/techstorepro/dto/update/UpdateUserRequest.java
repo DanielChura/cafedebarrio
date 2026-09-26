@@ -1,4 +1,4 @@
-package com.example.techstorepro.dto.request;
+package com.example.techstorepro.dto.update;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRequest {
+public class UpdateUserRequest {
     @NotBlank(message = "Name is required")
     @Size(max = 100, message = "Name must be at most 100 characters")
     private String name;
@@ -18,10 +18,6 @@ public class UserRequest {
     @Size(max = 100, message = "Email must be at most 100 characters")
     @Email(message = "Email must be a valid email address")
     private String email;
-
-    @NotBlank(message = "Password is required")
-    @Size(max = 100, message = "Password must be at most 100 characters")
-    private String password;
 
     @Size(max = 255, message = "Address must be at most 255 characters")
     private String address;

@@ -13,18 +13,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import lombok.AllArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@AllArgsConstructor
 public class SecurityConfig {
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
     private final JwtAuthenticationFilter jwtFilter;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter, OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
-        this.jwtFilter = jwtFilter;
-        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
