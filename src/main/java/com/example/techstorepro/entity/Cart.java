@@ -30,9 +30,9 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull(message = "User is required")
+    @NotNull(message = "El usuario es obligatorio")
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(unique = true)
+    @JoinColumn(unique = true, nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

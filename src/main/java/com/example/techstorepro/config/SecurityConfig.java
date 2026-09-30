@@ -1,5 +1,6 @@
 package com.example.techstorepro.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,17 +13,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import lombok.AllArgsConstructor;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@AllArgsConstructor
 public class SecurityConfig {
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
     private final JwtAuthenticationFilter jwtFilter;
+    private final HandlerExceptionResolver exceptionResolver;
+
+    public SecurityConfig(com.example.techstorepro.config.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+            JwtAuthenticationFilter jwtFilter,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
+        OAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        this.jwtFilter = jwtFilter;
+        this.exceptionResolver = exceptionResolver;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,6 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2.successHandler(OAuth2LoginSuccessHandler))
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        (req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex)))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

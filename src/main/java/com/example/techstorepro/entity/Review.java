@@ -33,21 +33,21 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull(message = "User is required")
+    @NotNull(message = "El usuario es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @NotNull(message = "Product is required")
+    @NotNull(message = "El producto es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Product product;
 
-    @NotNull(message = "Rating is required")
-    @Min(value = 1, message = "Rating must be at least 1")
-    @Max(value = 5, message = "Rating must be at most 5")
+    @NotNull(message = "La calificación es obligatoria")
+    @Min(value = 1, message = "La calificación debe ser al menos 1")
+    @Max(value = 5, message = "La calificación debe ser como máximo 5")
     @Column(nullable = false)
     private Integer rating;
 
-    @Size(max = 500, message = "Comment must be at most 500 characters")
+    @Size(max = 500, message = "El comentario debe tener como máximo 500 caracteres")
     @Column(length = 500)
     private String comment;
 

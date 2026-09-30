@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +22,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -40,28 +40,28 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Length(min = 1, max = 50, message = "Name must be between 1 and 50 characters")
+    @Size(max = 50, message = "El nombre debe tener como máximo 50 caracteres")
     private String name;
 
-    @Length(min = 1, max = 50, message = "Email must be between 1 and 50 characters")
-    @NotNull(message = "Email is required")
-    @Email(message = "Email is not valid")
+    @NotBlank(message = "El correo es obligatorio")
+    @Size(max = 50, message = "El correo debe tener como máximo 50 caracteres")
+    @Email(message = "El correo no es válido")
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @NotNull(message = "Password is required")
-    @Column(length = 255)
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Column(nullable = false, length = 255)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Role is required")
+    @NotNull(message = "El rol es obligatorio")
     @Column(nullable = false, length = 20)
-    private UserRole role;
+    private UserRole role = UserRole.CUSTOMER;
 
-    @Size(max = 255, message = "Address must be at most 255 characters")
-    @Column(length = 255)
+    @Size(max = 255, message = "La dirección debe tener como máximo 255 caracteres")
     private String address;
 
-    @Size(max = 30, message = "Phone must be at most 30 characters")
+    @Size(max = 30, message = "El teléfono debe tener como máximo 30 caracteres")
     @Column(length = 30)
     private String phone;
 

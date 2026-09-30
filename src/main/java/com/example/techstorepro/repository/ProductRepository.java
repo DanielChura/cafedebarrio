@@ -13,19 +13,19 @@ import com.example.techstorepro.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-        List<Product> findByActiveTrue();
+  List<Product> findByActiveTrue();
 
-        List<Product> findByCategoryId(UUID categoryId);
+  List<Product> findByCategoryId(UUID categoryId);
 
-        @Query("""
-                        SELECT p FROM Product p
-                        WHERE (:categoryId IS NULL OR p.category.id = :categoryId)
-                          AND (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
-                          AND (:onlyActive = false OR p.active = true)
-                        """)
-        Page<Product> findByFilters(
-                        @Param("categoryId") UUID categoryId,
-                        @Param("name") String name,
-                        @Param("onlyActive") boolean onlyActive,
-                        Pageable pageable);
+  @Query("""
+      SELECT p FROM Product p
+      WHERE (:categoryId IS NULL OR p.category.id = :categoryId)
+        AND (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        AND (:onlyActive = false OR p.active = true)
+      """)
+  Page<Product> findByFilters(
+      @Param("categoryId") UUID categoryId,
+      @Param("name") String name,
+      @Param("onlyActive") boolean onlyActive,
+      Pageable pageable);
 }

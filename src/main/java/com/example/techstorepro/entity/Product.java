@@ -10,7 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -35,39 +34,37 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 200, message = "Name must be at most 200 characters")
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 200, message = "El nombre debe tener como máximo 200 caracteres")
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Size(max = 600, message = "Description must be at most 600 characters")
+    @Size(max = 600, message = "La descripción debe tener como máximo 600 caracteres")
     @Column(length = 600)
     private String description;
 
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", inclusive = true, message = "Price must be greater than 0")
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.01", inclusive = true, message = "El precio debe ser mayor a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @NotNull(message = "Stock is required")
-    @Min(value = 0, message = "Stock must be greater than or equal to 0")
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock debe ser mayor o igual a 0")
     @Column(nullable = false)
     private Integer stock;
 
-    @NotBlank(message = "Image URL is required")
-    @Size(max = 500, message = "Image URL must be at most 500 characters")
+    @NotBlank(message = "La URL de la imagen es obligatoria")
+    @Size(max = 500, message = "La URL de la imagen debe tener como máximo 500 caracteres")
     @Column(nullable = false, length = 500)
     private String imageUrl;
 
-    @Size(max = 255, message = "Image public ID must be at most 255 characters")
-    @Column(length = 255)
+    @Size(max = 255, message = "El ID público debe tener como máximo 255 caracteres")
     private String publicId;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(nullable = false)
     private Boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
     private Category category;
 
     @Column(nullable = false, updatable = false)

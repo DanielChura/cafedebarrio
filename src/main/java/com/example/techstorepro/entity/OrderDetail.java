@@ -10,7 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -35,31 +34,30 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull(message = "Order is required")
+    @NotNull(message = "El pedido es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    @NotBlank(message = "Product name snapshot is required")
-    @Size(max = 100, message = "Product name must be at most 100 characters")
+    @NotBlank(message = "El nombre del producto es obligatorio")
+    @Size(max = 100, message = "El nombre del producto debe tener como máximo 100 caracteres")
     @Column(nullable = false, length = 100)
     private String productName;
 
-    @NotNull(message = "Quantity is required")
-    @Min(value = 1, message = "Quantity must be at least 1")
+    @NotNull(message = "La cantidad es obligatoria")
+    @Min(value = 1, message = "La cantidad debe ser al menos 1")
     @Column(nullable = false)
     private Integer quantity;
 
-    @NotNull(message = "Unit price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Unit price must be greater than 0")
+    @NotNull(message = "El precio unitario es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = false, message = "El precio unitario debe ser mayor a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
-    @NotNull(message = "Subtotal is required")
-    @DecimalMin(value = "0.0", inclusive = true, message = "Subtotal must be greater than or equal to 0")
+    @NotNull(message = "El subtotal es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = true, message = "El subtotal debe ser mayor o igual a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 

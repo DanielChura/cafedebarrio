@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.techstorepro.enums.OrderState;
+import com.example.techstorepro.enums.ReturnStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,42 +31,49 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "return_requests")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Order {
+public class ReturnRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotNull(message = "El estado es obligatorio")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ReturnStatus status = ReturnStatus.PENDING;
+
+    @NotBlank(message = "El motivo es obligatorio")
+    @Size(max = 500, message = "El motivo debe tener como máximo 500 caracteres")
+    @Column(nullable = false, length = 500)
+    private String reason;
+
+    @Size(max = 500, message = "El comentario debe tener como máximo 500 caracteres")
+    @Column(length = 500)
+    private String comment;
+
+    @Size(max = 500, message = "La observación debe tener como máximo 500 caracteres")
+    @Column(length = 500)
+    private String operatorNote;
+
+    @NotNull(message = "El importe es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = true, message = "El importe debe ser mayor o igual a 0")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount = BigDecimal.ZERO;
+
+    @NotNull(message = "La compra es obligatoria")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Order order;
+
     @NotNull(message = "El usuario es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @NotBlank(message = "El teléfono es obligatorio")
-    @Size(max = 50, message = "El teléfono debe tener como máximo 50 caracteres")
-    @Column(nullable = false, length = 50)
-    private String phone;
-
-    @NotBlank(message = "La dirección es obligatoria")
-    @Size(max = 200, message = "La dirección debe tener como máximo 200 caracteres")
-    @Column(nullable = false, length = 200)
-    private String address;
-
-    @NotNull(message = "El estado es obligatorio")
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private OrderState status = OrderState.PENDING;
-
-    @NotNull(message = "El total es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = true, message = "El total debe ser mayor o igual a 0")
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal total = BigDecimal.ZERO;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> items = new ArrayList<>();
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReturnDetail> items = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

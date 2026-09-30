@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import jakarta.security.auth.message.AuthException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -24,6 +28,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex) {
         return status(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler({ ExpiredJwtException.class, JwtException.class })
+    public ResponseEntity<ApiError> handleExpiredJwt(ExpiredJwtException ex) {
+        return status(HttpStatus.UNAUTHORIZED, "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+    }
+
+    @ExceptionHandler({ AuthException.class, AuthenticationException.class })
+    public ResponseEntity<ApiError> handleAuth(AuthenticationException ex) {
+        return status(HttpStatus.UNAUTHORIZED, "No autenticado: debes iniciar sesión.");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleDenied(AccessDeniedException ex) {
+        return status(HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta acción.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,16 +66,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ApiError> handleMultipart(MultipartException ex) {
         return status(HttpStatus.BAD_REQUEST, "Error al subir el archivo: " + ex.getMessage());
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> handleDenied(AccessDeniedException ex) {
-        return status(HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta accion");
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiError> handleAuth(AuthenticationException ex) {
-        return status(HttpStatus.UNAUTHORIZED, "No autenticado: inicia sesion");
     }
 
     @ExceptionHandler(Exception.class)
