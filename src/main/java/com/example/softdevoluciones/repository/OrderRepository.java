@@ -1,0 +1,14 @@
+package com.example.softdevoluciones.repository;
+
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.softdevoluciones.entity.Order;
+
+public interface OrderRepository extends JpaRepository<Order, UUID> {
+
+    Page<Order> findByUser_Id(UUID userId, Pageable pageable);
+}

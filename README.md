@@ -5,7 +5,7 @@ API del mini e-commerce de accesorios tecnológicos. Java 21 + Spring Boot + JWT
 ## Requisitos
 
 - Java 21 (no necesitas instalar Maven, el wrapper lo descarga solo la primera vez).
-- SQL Server local con la base de datos `techstorepro` creada.
+- SQL Server local con la base de datos `softdevoluciones` creada.
 - Credenciales de Cloudinary (las imágenes de producto son requeridas, solo WEBP)
   y de Google OAuth2 (login con Google).
 
